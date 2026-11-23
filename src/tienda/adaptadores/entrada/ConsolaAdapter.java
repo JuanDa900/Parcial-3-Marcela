@@ -26,24 +26,15 @@ public class ConsolaAdapter {
         int opcion;
         do {
             mostrarMenu();
-            opcion = leerEntero("Seleccione una opción: ");
+            opcion = leerOpcionMenu("Seleccione una opción: ", 0, 6);
             switch (opcion) {
-                case 1 ->
-                    verCatalogo();
-                case 2 ->
-                    filtrarPorCategoria();
-                case 3 ->
-                    agregarAlCarrito();
-                case 4 ->
-                    gestionarCarrito();
-                case 5 ->
-                    cerrarPedido();
-                case 6 ->
-                    verHistorialYSeguimiento();
-                case 0 ->
-                    System.out.println("Saliendo del sistema...");
-                default ->
-                    System.out.println("Opción inválida.");
+                case 1 -> verCatalogo();
+                case 2 -> filtrarPorCategoria();
+                case 3 -> agregarAlCarrito();
+                case 4 -> gestionarCarrito();
+                case 5 -> cerrarPedido();
+                case 6 -> verHistorialYSeguimiento();
+                case 0 -> System.out.println("Saliendo del sistema...");
             }
         } while (opcion != 0);
     }
@@ -59,13 +50,17 @@ public class ConsolaAdapter {
         } while (nombre.isEmpty());
 
         String doc;
+        boolean docValido;
         do {
             System.out.print("Documento: ");
             doc = scanner.nextLine().trim();
+            docValido = !doc.isEmpty() && doc.matches("\\d+");
             if (doc.isEmpty()) {
                 System.out.println("El documento no puede estar vacío.");
+            } else if (!doc.matches("\\d+")) {
+                System.out.println("Error: El documento solo debe contener números enteros.");
             }
-        } while (doc.isEmpty());
+        } while (!docValido);
 
         boolean frecuente = leerConfirmacion("¿Es cliente frecuente? (s/n): ");
         this.clienteActual = new Cliente(nombre, doc, frecuente);
@@ -84,7 +79,12 @@ public class ConsolaAdapter {
 
     private void verCatalogo() {
         System.out.println("\n--- CATÁLOGO DE PRODUCTOS ---");
-        for (Producto p : tiendaUseCase.listarCatalogo()) {
+        List<Producto> catalogo = tiendaUseCase.listarCatalogo();
+        if (catalogo.isEmpty()) {
+            System.out.println("No hay productos disponibles en el catálogo.");
+            return;
+        }
+        for (Producto p : catalogo) {
             System.out.println(p);
         }
     }
@@ -96,25 +96,17 @@ public class ConsolaAdapter {
         System.out.println("3. Alimento");
         System.out.println("0. Volver");
 
-        int op = leerEntero("Opción: ");
-        String categoria = switch (op) {
-            case 1 ->
-                "Ropa";
-            case 2 ->
-                "Tecnologia";
-            case 3 ->
-                "Alimento";
-            case 0 ->
-                null;
-            default -> {
-                System.out.println("Opción no válida.");
-                yield null;
-            }
-        };
-
-        if (categoria == null) {
+        int op = leerOpcionMenu("Opción: ", 0, 3);
+        if (op == 0) {
             return;
         }
+
+        String categoria = switch (op) {
+            case 1 -> "Ropa";
+            case 2 -> "Tecnologia";
+            case 3 -> "Alimento";
+            default -> null;
+        };
 
         List<Producto> lista = tiendaUseCase.listarPorCategoria(categoria);
         System.out.println("\n--- PRODUCTOS EN " + categoria.toUpperCase() + " ---");
@@ -127,9 +119,8 @@ public class ConsolaAdapter {
 
     private void agregarAlCarrito() {
         verCatalogo();
-        System.out.print("\nCódigo del producto: ");
-        String codigo = scanner.nextLine().trim();
-        int cantidad = leerEntero("Cantidad: ");
+        String codigo = leerTextoNoVacio("\nCódigo del producto: ");
+        int cantidad = leerEnteroPositivo("Cantidad: ");
 
         if (tiendaUseCase.agregarAlCarrito(codigo, cantidad)) {
             System.out.println("Producto agregado correctamente.");
@@ -156,20 +147,18 @@ public class ConsolaAdapter {
         System.out.println("\n1. Cambiar cantidad de un producto");
         System.out.println("2. Eliminar un producto");
         System.out.println("0. Volver");
-        int op = leerEntero("Elige: ");
+        int op = leerOpcionMenu("Elige: ", 0, 2);
 
         if (op == 1) {
-            System.out.print("Código del producto a modificar: ");
-            String cod = scanner.nextLine().trim();
-            int nuevaCant = leerEntero("Nueva cantidad (0 para eliminar): ");
+            String cod = leerTextoNoVacio("Código del producto a modificar: ");
+            int nuevaCant = leerOpcionMenu("Nueva cantidad (0 para eliminar): ", 0, 1000);
             if (tiendaUseCase.modificarCantidadCarrito(cod, nuevaCant)) {
                 System.out.println("Carrito actualizado.");
             } else {
                 System.out.println("No se pudo actualizar (verifica código o stock).");
             }
         } else if (op == 2) {
-            System.out.print("Código del producto a eliminar: ");
-            String cod = scanner.nextLine().trim();
+            String cod = leerTextoNoVacio("Código del producto a eliminar: ");
             if (tiendaUseCase.eliminarDelCarrito(cod)) {
                 System.out.println("Producto eliminado del carrito.");
             } else {
@@ -188,27 +177,29 @@ public class ConsolaAdapter {
         System.out.print("\nCódigo de cupón (ej. PROMO20) o Enter para omitir: ");
         String cupon = scanner.nextLine().trim();
 
-        System.out.print("¿Agregar Envío Express (+$15.00)? (s/n): ");
-        boolean express = scanner.nextLine().trim().equalsIgnoreCase("s");
+        boolean express = leerConfirmacion("¿Agregar Envío Express (+$15.00)? (s/n): ");
 
         System.out.println("\nMétodo de pago:");
         System.out.println("1. Tarjeta (1 cuota sin interés; +1 cuota 3% recargo)");
         System.out.println("2. Transferencia bancaria (5% descuento extra)");
         System.out.println("3. Contra entrega (+$10 fijo, máx $500)");
-        int opPago = leerEntero("Seleccione medio de pago: ");
+        System.out.println("0. Cancelar compra");
+        int opPago = leerOpcionMenu("Seleccione medio de pago: ", 0, 3);
+
+        if (opPago == 0) {
+            System.out.println("Compra cancelada.");
+            return;
+        }
 
         MetodoPago metodoPago;
         switch (opPago) {
             case 1 -> {
-                int cuotas = leerEntero("Número de cuotas (1 a 12): ");
+                int cuotas = leerOpcionMenu("Número de cuotas (1 a 12): ", 1, 12);
                 metodoPago = new PagoTarjeta(cuotas);
             }
-            case 2 ->
-                metodoPago = new PagoTransferencia();
-            case 3 ->
-                metodoPago = new PagoContraEntrega();
+            case 2 -> metodoPago = new PagoTransferencia();
+            case 3 -> metodoPago = new PagoContraEntrega();
             default -> {
-                System.out.println("Método inválido.");
                 return;
             }
         }
@@ -238,9 +229,8 @@ public class ConsolaAdapter {
                     p.getMetodoPago(), p.getEstadoEnvio().name(), p.getEstadoEnvio().getDescripcion());
         }
 
-        System.out.print("\n¿Deseas simular el avance de envío de algún pedido? (s/n): ");
-        if (scanner.nextLine().trim().equalsIgnoreCase("s")) {
-            int id = leerEntero("Ingresa el # de Pedido: ");
+        if (leerConfirmacion("\n¿Deseas simular el avance de envío de algún pedido? (s/n): ")) {
+            int id = leerEnteroPositivo("Ingresa el # de Pedido: ");
             if (tiendaUseCase.avanzarEstadoEnvioPedido(id)) {
                 System.out.println("Estado de envío actualizado correctamente.");
             } else {
@@ -249,14 +239,47 @@ public class ConsolaAdapter {
         }
     }
 
+    // --- MÉTODOS DE VALIDACIÓN DE ENTRADA ---
+
     private int leerEntero(String msg) {
         while (true) {
             try {
                 System.out.print(msg);
                 return Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("Ingrese un número válido.");
+                System.out.println("Error: Ingrese un número entero válido.");
             }
+        }
+    }
+
+    private int leerOpcionMenu(String msg, int min, int max) {
+        while (true) {
+            int opcion = leerEntero(msg);
+            if (opcion >= min && opcion <= max) {
+                return opcion;
+            }
+            System.out.printf("Opción fuera de rango. Ingresa un número entre %d y %d.\n", min, max);
+        }
+    }
+
+    private int leerEnteroPositivo(String msg) {
+        while (true) {
+            int num = leerEntero(msg);
+            if (num > 0) {
+                return num;
+            }
+            System.out.println("Error: El valor debe ser mayor a 0.");
+        }
+    }
+
+    private String leerTextoNoVacio(String msg) {
+        while (true) {
+            System.out.print(msg);
+            String texto = scanner.nextLine().trim();
+            if (!texto.isEmpty()) {
+                return texto;
+            }
+            System.out.println("Error: Este campo no puede estar vacío.");
         }
     }
 
