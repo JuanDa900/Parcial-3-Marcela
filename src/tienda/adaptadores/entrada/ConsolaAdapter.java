@@ -26,7 +26,7 @@ public class ConsolaAdapter {
         int opcion;
         do {
             mostrarMenu();
-            opcion = leerOpcionMenu("Seleccione una opción: ", 0, 6);
+            opcion = leerOpcionMenu("Seleccione una opcion: ", 0, 6);
             switch (opcion) {
                 case 1 -> verCatalogo();
                 case 2 -> filtrarPorCategoria();
@@ -45,7 +45,7 @@ public class ConsolaAdapter {
             System.out.print("Nombre del cliente: ");
             nombre = scanner.nextLine().trim();
             if (nombre.isEmpty()) {
-                System.out.println("El nombre no puede estar vacío.");
+                System.out.println("El nombre no puede estar vacio.");
             }
         } while (nombre.isEmpty());
 
@@ -56,9 +56,9 @@ public class ConsolaAdapter {
             doc = scanner.nextLine().trim();
             docValido = !doc.isEmpty() && doc.matches("\\d+");
             if (doc.isEmpty()) {
-                System.out.println("El documento no puede estar vacío.");
+                System.out.println("El documento no puede estar vacio.");
             } else if (!doc.matches("\\d+")) {
-                System.out.println("Error: El documento solo debe contener números enteros.");
+                System.out.println("Error: El documento solo debe contener numeros enteros.");
             }
         } while (!docValido);
 
@@ -67,21 +67,21 @@ public class ConsolaAdapter {
     }
 
     private void mostrarMenu() {
-        System.out.println("\n--- MENÚ PRINCIPAL ---");
-        System.out.println("1. Ver catálogo completo");
-        System.out.println("2. Filtrar catálogo por categoría");
+        System.out.println("\n--- MENU PRINCIPAL ---");
+        System.out.println("1. Ver catalogo completo");
+        System.out.println("2. Filtrar catalogo por categoria");
         System.out.println("3. Agregar producto al carrito");
         System.out.println("4. Ver / modificar / eliminar del carrito");
         System.out.println("5. Finalizar compra y pagar");
-        System.out.println("6. Historial de pedidos y seguimiento de envío");
+        System.out.println("6. Historial de pedidos y seguimiento de envio");
         System.out.println("0. Salir");
     }
 
     private void verCatalogo() {
-        System.out.println("\n--- CATÁLOGO DE PRODUCTOS ---");
+        System.out.println("\n--- CATALOGO DE PRODUCTOS ---");
         List<Producto> catalogo = tiendaUseCase.listarCatalogo();
         if (catalogo.isEmpty()) {
-            System.out.println("No hay productos disponibles en el catálogo.");
+            System.out.println("No hay productos disponibles en el catalogo.");
             return;
         }
         for (Producto p : catalogo) {
@@ -92,11 +92,11 @@ public class ConsolaAdapter {
     private void filtrarPorCategoria() {
         System.out.println("\n--- SELECCIONE UNA CATEGORÍA ---");
         System.out.println("1. Ropa");
-        System.out.println("2. Tecnología");
+        System.out.println("2. Tecnologia");
         System.out.println("3. Alimento");
         System.out.println("0. Volver");
 
-        int op = leerOpcionMenu("Opción: ", 0, 3);
+        int op = leerOpcionMenu("Opcion: ", 0, 3);
         if (op == 0) {
             return;
         }
@@ -111,7 +111,7 @@ public class ConsolaAdapter {
         List<Producto> lista = tiendaUseCase.listarPorCategoria(categoria);
         System.out.println("\n--- PRODUCTOS EN " + categoria.toUpperCase() + " ---");
         if (lista.isEmpty()) {
-            System.out.println("No se encontraron productos en esa categoría.");
+            System.out.println("No se encontraron productos en esa categoria.");
         } else {
             lista.forEach(System.out::println);
         }
@@ -125,14 +125,14 @@ public class ConsolaAdapter {
         if (tiendaUseCase.agregarAlCarrito(codigo, cantidad)) {
             System.out.println("Producto agregado correctamente.");
         } else {
-            System.out.println("No se pudo agregar (código inexistente o stock insuficiente).");
+            System.out.println("No se pudo agregar (codigo inexistente o stock insuficiente).");
         }
     }
 
     private void gestionarCarrito() {
         Carrito carrito = tiendaUseCase.obtenerCarrito();
         if (carrito.estaVacio()) {
-            System.out.println("\nEl carrito está vacío.");
+            System.out.println("\nEl carrito esta vacio.");
             return;
         }
 
@@ -158,7 +158,7 @@ public class ConsolaAdapter {
                 System.out.println("No se pudo actualizar (verifica código o stock).");
             }
         } else if (op == 2) {
-            String cod = leerTextoNoVacio("Código del producto a eliminar: ");
+            String cod = leerTextoNoVacio("Codigo del producto a eliminar: ");
             if (tiendaUseCase.eliminarDelCarrito(cod)) {
                 System.out.println("Producto eliminado del carrito.");
             } else {
@@ -174,10 +174,10 @@ public class ConsolaAdapter {
             return;
         }
 
-        System.out.print("\nCódigo de cupón (ej. PROMO20) o Enter para omitir: ");
+        System.out.print("\nCodigo de cupon (ej. PROMO20) o Enter para omitir: ");
         String cupon = scanner.nextLine().trim();
 
-        boolean express = leerConfirmacion("¿Agregar Envío Express (+$15.00)? (s/n): ");
+        boolean express = leerConfirmacion("¿Agregar Envio Express (+$15.00)? (s/n): ");
 
         System.out.println("\nMétodo de pago:");
         System.out.println("1. Tarjeta (1 cuota sin interés; +1 cuota 3% recargo)");
@@ -208,7 +208,7 @@ public class ConsolaAdapter {
         Pedido pedido = tiendaUseCase.confirmarCompra(clienteActual, cupon, express, metodoPago);
 
         if (pedido == null) {
-            System.out.println("Error: El pago no cumple con las validaciones del método elegido.");
+            System.out.println("Error: El pago no cumple con las validaciones del metodo elegido.");
         } else {
             System.out.println(pedido.generarFactura());
             System.out.println("Factura guardada localmente en: datos/factura_" + pedido.getId() + ".txt");
@@ -224,15 +224,15 @@ public class ConsolaAdapter {
 
         System.out.println("\n--- HISTORIAL DE PEDIDOS ---");
         for (Pedido p : historial) {
-            System.out.printf("Pedido #%d | Cliente: %s | Total: $%.2f | Pago: %s | Estado Envío: %s (%s)\n",
+            System.out.printf("Pedido #%d | Cliente: %s | Total: $%.2f | Pago: %s | Estado Envio: %s (%s)\n",
                     p.getId(), p.getCliente().getNombre(), p.getTotalPagado(),
                     p.getMetodoPago(), p.getEstadoEnvio().name(), p.getEstadoEnvio().getDescripcion());
         }
 
-        if (leerConfirmacion("\n¿Deseas simular el avance de envío de algún pedido? (s/n): ")) {
+        if (leerConfirmacion("\n¿Deseas simular el avance de envio de algun pedido? (s/n): ")) {
             int id = leerEnteroPositivo("Ingresa el # de Pedido: ");
             if (tiendaUseCase.avanzarEstadoEnvioPedido(id)) {
-                System.out.println("Estado de envío actualizado correctamente.");
+                System.out.println("Estado de envio actualizado correctamente.");
             } else {
                 System.out.println("Pedido no encontrado.");
             }
@@ -247,7 +247,7 @@ public class ConsolaAdapter {
                 System.out.print(msg);
                 return Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("Error: Ingrese un número entero válido.");
+                System.out.println("Error: Ingrese un numero entero valido.");
             }
         }
     }
@@ -279,7 +279,7 @@ public class ConsolaAdapter {
             if (!texto.isEmpty()) {
                 return texto;
             }
-            System.out.println("Error: Este campo no puede estar vacío.");
+            System.out.println("Error: Este campo no puede estar vacio.");
         }
     }
 
