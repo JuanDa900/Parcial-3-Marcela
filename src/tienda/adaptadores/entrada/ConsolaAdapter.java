@@ -90,9 +90,34 @@ public class ConsolaAdapter {
     }
 
     private void filtrarPorCategoria() {
-        System.out.print("Ingrese categoría (Ropa / Tecnologia / Alimento): ");
-        String cat = scanner.nextLine().trim();
-        List<Producto> lista = tiendaUseCase.listarPorCategoria(cat);
+        System.out.println("\n--- SELECCIONE UNA CATEGORÍA ---");
+        System.out.println("1. Ropa");
+        System.out.println("2. Tecnología");
+        System.out.println("3. Alimento");
+        System.out.println("0. Volver");
+
+        int op = leerEntero("Opción: ");
+        String categoria = switch (op) {
+            case 1 ->
+                "Ropa";
+            case 2 ->
+                "Tecnologia";
+            case 3 ->
+                "Alimento";
+            case 0 ->
+                null;
+            default -> {
+                System.out.println("Opción no válida.");
+                yield null;
+            }
+        };
+
+        if (categoria == null) {
+            return;
+        }
+
+        List<Producto> lista = tiendaUseCase.listarPorCategoria(categoria);
+        System.out.println("\n--- PRODUCTOS EN " + categoria.toUpperCase() + " ---");
         if (lista.isEmpty()) {
             System.out.println("No se encontraron productos en esa categoría.");
         } else {
