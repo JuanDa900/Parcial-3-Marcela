@@ -49,12 +49,25 @@ public class ConsolaAdapter {
     }
 
     private void registrarCliente() {
-        System.out.print("Nombre del cliente: ");
-        String nombre = scanner.nextLine().trim();
-        System.out.print("Documento: ");
-        String doc = scanner.nextLine().trim();
-        System.out.print("¿Es cliente frecuente? (s/n): ");
-        boolean frecuente = scanner.nextLine().trim().equalsIgnoreCase("s");
+        String nombre;
+        do {
+            System.out.print("Nombre del cliente: ");
+            nombre = scanner.nextLine().trim();
+            if (nombre.isEmpty()) {
+                System.out.println("El nombre no puede estar vacío.");
+            }
+        } while (nombre.isEmpty());
+
+        String doc;
+        do {
+            System.out.print("Documento: ");
+            doc = scanner.nextLine().trim();
+            if (doc.isEmpty()) {
+                System.out.println("El documento no puede estar vacío.");
+            }
+        } while (doc.isEmpty());
+
+        boolean frecuente = leerConfirmacion("¿Es cliente frecuente? (s/n): ");
         this.clienteActual = new Cliente(nombre, doc, frecuente);
     }
 
@@ -219,6 +232,20 @@ public class ConsolaAdapter {
             } catch (NumberFormatException e) {
                 System.out.println("Ingrese un número válido.");
             }
+        }
+    }
+
+    private boolean leerConfirmacion(String msg) {
+        while (true) {
+            System.out.print(msg);
+            String respuesta = scanner.nextLine().trim();
+            if (respuesta.equalsIgnoreCase("s")) {
+                return true;
+            }
+            if (respuesta.equalsIgnoreCase("n")) {
+                return false;
+            }
+            System.out.println("Respuesta inválida. Por favor ingresa 's' para sí o 'n' para no.");
         }
     }
 }

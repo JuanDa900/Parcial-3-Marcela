@@ -40,7 +40,15 @@ public class ArchivoProductoRepository implements ProductoRepository {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
             while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) {
+                    continue;
+                }
+
                 String[] partes = linea.split(";");
+                if (partes.length < 7) {
+                    continue;
+                }
+
                 String categoria = partes[0];
                 String codigo = partes[1];
                 String nombre = partes[2];
