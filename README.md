@@ -6,6 +6,7 @@ Autores:
 -Carlos Angulo
 -Juan Arévalo
 
+los commits de cada uno estan en las diferentes ramas (dev y implements)
 la documentacion completa esta en la rama Doc en github.
 
 Instrucciones para Ejecutar:
