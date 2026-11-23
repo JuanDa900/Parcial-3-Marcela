@@ -1,1 +1,12 @@
+# Datos locales generados en ejecución
+datos/
+
+# Archivos compilados de Java
 bin/
+*.class
+
+# Configuración local del IDE
+.vscode/
+.settings/
+.classpath
+.project
